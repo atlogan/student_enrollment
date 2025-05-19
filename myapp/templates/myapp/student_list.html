@@ -2,7 +2,9 @@
 {% block title %}Student List{% endblock title%}
 {% block content%} 
 <h3>Students</h3>
+{% if user.is_authenticated %}
 <a href="{% url 'student_create' %}" class="btn btn-primary">Add Student</a>
+{% endif%}
 <table class="table">
     <thead>
         <tr>
