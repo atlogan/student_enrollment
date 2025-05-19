@@ -112,6 +112,34 @@ python manage.py createsuperuser
    - Delete your own records (should work)
    - Delete others' records (should be denied)
 
+## API Endpoints (Django REST Framework)
+
+The application now includes RESTful API endpoints built with Django REST Framework (DRF). These endpoints provide programmatic access to the system's data.
+
+### Base URL
+All API endpoints are available under the `/api/` prefix.
+
+### Available Endpoints
+- `/api/students/` - Student management endpoints
+- `/api/courses/` - Course management endpoints
+- `/api/enrollments/` - Enrollment management endpoints
+
+### Testing the API
+
+1. Start the development server:
+```bash
+python manage.py runserver
+```
+
+2. Log in to the web interface first:
+   - Visit `http://127.0.0.1:8000/accounts/login/`
+   - Log in with your credentials
+
+3. Access the API:
+   - Visit `http://127.0.0.1:8000/api/` to see available endpoints
+   - Use the browsable API interface to test endpoints
+   - All endpoints require authentication
+
 ## Project Structure
 
 ```
