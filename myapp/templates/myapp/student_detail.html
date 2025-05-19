@@ -1,0 +1,9 @@
+{% extends 'myapp/base_template.html' %}
+{% block title%}{{ student.name}}{% endblock title%}
+{% block content%} 
+<p>Name: {{student.name}}</p>
+<p>Major: {{student.major}}</p>
+<p>Enrollment Date: {{student.enrollment_date}}</p>
+<a href="{% url 'student_update' student.pk %}" class="btn btn-primary">Edit</a>
+<a href="{% url 'student_delete' student.pk %}" class="btn btn-danger">Delete</a>
+{% endblock content%}
