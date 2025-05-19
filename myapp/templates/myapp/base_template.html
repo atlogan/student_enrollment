@@ -11,6 +11,19 @@
         <li class="nav-item">
           <a class="nav-link" aria-current="page" href="{% url 'student_list' %}">Students</a>
         </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <p>Hi {{ user.email }}!</p>
+          <a class="nav-link" aria-current="page" href="{% url 'account_logout' %}">Logout</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{% url 'account_login' %}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="{% url 'account_signup' %}">Sign Up</a>
+        </li>
+        {% endif %}
       </ul>
     <div class="container mt-4">
         {% block content %}
