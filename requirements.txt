@@ -1,4 +1,5 @@
 asgiref==3.8.1
+attrs==25.3.0
 certifi==2025.4.26
 cffi==1.17.1
 charset-normalizer==3.4.2
@@ -6,12 +7,20 @@ cryptography==45.0.2
 Django==5.2.1
 django-allauth==65.8.0
 django-environ==0.12.0
+djangorestframework==3.16.0
 idna==3.10
+inflection==0.5.1
+jsonschema==4.23.0
+jsonschema-specifications==2025.4.1
 psycopg==3.2.9
 psycopg-binary==3.2.9
 pycparser==2.22
 PyJWT==2.10.1
+PyYAML==6.0.2
+referencing==0.36.2
 requests==2.32.3
+rpds-py==0.25.0
 sqlparse==0.5.3
 typing_extensions==4.13.2
+uritemplate==4.1.1
 urllib3==2.4.0
