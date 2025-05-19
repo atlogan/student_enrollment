@@ -1,58 +1,131 @@
-# Student Management System
+# Student Enrollment System
 
-A Django-based student management system that allows for managing students, instructors, courses, classes, and enrollments. This project implements full CRUD (Create, Read, Update, Delete) operations for the Student model.
+A Django-based student enrollment system with user authentication, permissions, and social login capabilities.
 
-## CRUD Implementation
+## Features
 
-The CRUD operations have been implemented for the `Student` model, which includes the following fields:
-- Name
-- Major
-- Enrollment Date
+- User Authentication (Local and Google OAuth)
+- Role-based Access Control
+- CRUD Operations with Permission Checks
+- Secure Environment Variable Management
+- PostgreSQL Database Support
 
-## Base URL Path
+## Prerequisites
 
-The application's views can be accessed at the root URL `/`. The following endpoints are available:
+- Python 3.10 or higher
+- PostgreSQL
+- Google Cloud Platform Account (for OAuth)
 
-- List all students: `/`
-- View student details: `/<student_id>`
-- Create new student: `/create/`
-- Update student: `/<student_id>/update/`
-- Delete student: `/<student_id>/delete/`
+## Installation
 
-## Navigation Instructions
+1. Clone the repository:
+```bash
+git clone https://github.com/atlogan/student_enrollment
+cd student_enrollment
+```
 
-### Viewing Students
-1. Access the home page (`/`) to see a list of all students
-2. Click on any student's name to view their details
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-### Creating a New Student
-1. From the student list page, click the "Add Student" button
-2. Fill in the required information:
-   - Name
-   - Major
-   - Enrollment Date (e.g. 2023-05-01)
-3. Click "Save" to create the new student record
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-### Updating Student Information
-1. From a student's detail page, click the "Edit" button
-2. Modify the desired fields
-3. Click "Save" to save the changes
+4. Create a `.env` file in the project root with the following variables:
+```env
+DEBUG=True
+SECRET_KEY=your-secret-key
+DATABASE_URL=postgres://user:password@localhost:5432/dbname
+ACCOUNT_EMAIL_REQUIRED=True
+ACCOUNT_USERNAME_REQUIRED=False
+ACCOUNT_AUTHENTICATION_METHOD='email'
+ACCOUNT_EMAIL_VERIFICATION='optional'
+LOGIN_REDIRECT_URL='/'
+ACCOUNT_LOGOUT_REDIRECT_URL='/'
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
 
-### Deleting a Student
-1. From a student's detail page, click the "Delete" button
-2. Confirm the deletion on the confirmation page
+## Google OAuth Setup
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Navigate to "APIs & Services" > "Credentials"
+4. Click "Create Credentials" > "OAuth client ID"
+5. Configure the OAuth consent screen:
+   - Select "External" user type
+   - Fill in required fields (App name, User support email, Developer contact)
+   - Add scopes: `.../auth/userinfo.email` and `.../auth/userinfo.profile`
+   - Add your email as a test user
+6. Create OAuth client ID:
+   - Application type: Web application
+   - Name: "Django Student Enrollment"
+   - Authorized redirect URI: `http://127.0.0.1:8000/accounts/google/login/callback/` (and/or http://localhost:8000/accounts/google/login/callback/)
+7. Copy the Client ID and Client Secret to your `.env` file
+
+## Database Setup
+
+1. Create a PostgreSQL database
+2. Update the `DATABASE_URL` in your `.env` file
+3. Run migrations:
+```bash
+python manage.py migrate
+```
+
+## Running the Application
+
+1. Start the development server:
+```bash
+python manage.py runserver
+```
+
+2. Visit `http://127.0.0.1:8000` in your browser
+
+## Testing Authentication
+
+### Local Authentication
+1. Create a superuser:
+```bash
+python manage.py createsuperuser
+```
+2. Visit `http://127.0.0.1:8000/accounts/login/`
+3. Log in with your superuser credentials
+
+### Google Authentication
+1. Visit `http://127.0.0.1:8000/accounts/login/`
+2. Click "Login with Google"
+3. Select your Google account
+4. Authorize the application
+
+## Testing Permissions
+
+1. Create a regular user account
+2. Log in as the regular user
+3. Try to:
+   - Create new records (should work)
+   - Edit your own records (should work)
+   - Edit others' records (should be denied)
+   - Delete your own records (should work)
+   - Delete others' records (should be denied)
 
 ## Project Structure
 
-The project includes the following models:
-- Student: For managing student information
-- Instructor: For managing instructor information
-- Course: For managing course information
-- Class: For managing class schedules and assignments
-- Enrollment: For managing student enrollments in classes
+```
+student_enrollment/
+├── myproject/          # Project settings
+├── myapp/             # Main application
+├── manage.py          # Django management script
+├── requirements.txt   # Project dependencies
+└── .env              # Environment variables (not in git)
+```
 
-## Technical Details
+## Security Notes
 
-- Built with Django 5.2
-- Uses Class-Based Generic Views for CRUD operations
-- Uses Postgres database 
+- Never commit the `.env` file to version control
+- Keep your `SECRET_KEY` secure
+- Regularly update dependencies
+- Use HTTPS in production
