@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from rest_framework import viewsets, permissions
 from .models import Student # Import your specific model
-
+from .serializers import StudentSerializer
 # Create your views here.
 class StudentListView(LoginRequiredMixin, ListView):
     model = Student    
@@ -35,3 +36,20 @@ class StudentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         return self.request.user.is_staff
+    
+
+class StudentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows Student objects to be viewed or edited.
+    Provides list, create, retrieve, update, partial_update, destroy actions.
+    """
+    queryset = Student.objects.all().order_by('-id') # Or appropriate ordering
+    serializer_class = StudentSerializer
+    
+    # Optional: Override default permissions just for this viewset
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    # Optional: Implement custom logic, e.g., setting owner on create
+    # def perform_create(self, serializer):
+    #    # Assumes 'owner' field exists on YourModel and is linked to User
+    #    serializer.save(owner=self.request.user)    
