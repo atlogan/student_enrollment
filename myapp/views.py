@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from rest_framework import viewsets, permissions
 from .models import Student # Import your specific model
 from .serializers import StudentSerializer
+from .permissions import IsOwnerOrReadOnly
 # Create your views here.
 class StudentListView(LoginRequiredMixin, ListView):
     model = Student    
@@ -46,13 +47,12 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('-id') # Or appropriate ordering
     serializer_class = StudentSerializer
     
-    # Optional: Override default permissions just for this viewset
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # Apply permissions: User must be authenticated (global default) 
+    # AND be owner for write operations (IsOwnerOrReadOnly check).
+    # Read operations allowed if IsAuthenticated passes.
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly] 
     # Filtering configuration (uses global DEFAULT_FILTER_BACKENDS)
     filterset_fields = ['name', 'major'] # Fields for exact matches (e.g., ?field1=value)
     search_fields = ['name', 'major']    # Fields for ?search=... parameter
     ordering_fields = ['major', 'enrollment_date'] # Fields for ?ordering=... parameter
-    # Optional: Implement custom logic, e.g., setting owner on create
-    # def perform_create(self, serializer):
-    #    # Assumes 'owner' field exists on YourModel and is linked to User
-    #    serializer.save(owner=self.request.user)    
+    
