@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_filters'
 ]
 
 SITE_ID = 1
@@ -167,9 +168,11 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.IsAuthenticatedOrReadOnly' # Allows anonymous GET requests
         # 'rest_framework.permissions.AllowAny' # No restrictions (use carefully!)
     ],
-    # Optional: Default pagination settings
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # 'PAGE_SIZE': 10
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
 }
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

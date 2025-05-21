@@ -48,7 +48,10 @@ class StudentViewSet(viewsets.ModelViewSet):
     
     # Optional: Override default permissions just for this viewset
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    
+    # Filtering configuration (uses global DEFAULT_FILTER_BACKENDS)
+    filterset_fields = ['name', 'major'] # Fields for exact matches (e.g., ?field1=value)
+    search_fields = ['name', 'major']    # Fields for ?search=... parameter
+    ordering_fields = ['major', 'enrollment_date'] # Fields for ?ordering=... parameter
     # Optional: Implement custom logic, e.g., setting owner on create
     # def perform_create(self, serializer):
     #    # Assumes 'owner' field exists on YourModel and is linked to User
