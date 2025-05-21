@@ -55,4 +55,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     filterset_fields = ['name', 'major'] # Fields for exact matches (e.g., ?field1=value)
     search_fields = ['name', 'major']    # Fields for ?search=... parameter
     ordering_fields = ['major', 'enrollment_date'] # Fields for ?ordering=... parameter
-    
+    # Ensure Owner is set to the current user on creation
+    def perform_create(self, serializer):
+            # Assumes 'owner' field exists on YourModel and is linked to User
+            serializer.save(owner=self.request.user)    
