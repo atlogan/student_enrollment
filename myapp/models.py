@@ -5,6 +5,7 @@ class Student(models.Model):
     name = models.CharField(max_length=100)
     major = models.CharField(max_length=50)
     enrollment_date = models.DateField()
+    active = models.BooleanField(default=True)
     
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='%(class)s_items', on_delete=models.CASCADE)
     

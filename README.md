@@ -140,6 +140,82 @@ python manage.py runserver
    - Use the browsable API interface to test endpoints
    - All endpoints require authentication
 
+### API Features
+
+#### Filtering, Searching, and Ordering
+The API supports filtering, searching, and ordering through query parameters:
+
+- **Filtering**: Filter results by specific field values
+  ```
+  GET /api/students/?major=Computer+Science
+  ```
+
+- **Searching**: Search across multiple fields
+  ```
+  GET /api/students/?search=john
+  ```
+
+- **Ordering**: Sort results by any field
+  ```
+  GET /api/students/?ordering=last_name
+  ```
+
+Multiple parameters can be combined:
+```
+GET /api/students/?search=smith&ordering=-created_at
+```
+
+#### Pagination
+The API implements pagination with the following features:
+
+- Default page size: 10 items per page
+- Custom page size: `?page_size=20`
+- Navigation: `?page=2`
+- Example:
+  ```
+  GET /api/students/?page=2&page_size=20
+  ```
+
+#### Permissions
+The API implements custom permission logic:
+
+- **Student Records**:
+  - List/Create: Any authenticated user
+  - Retrieve: Any authenticated user
+  - Update/Delete: Only the student owner or staff members
+
+- **Course Records**:
+  - List/Retrieve: Any authenticated user
+  - Create/Update/Delete: Staff members only
+
+- **Enrollment Records**:
+  - List/Create: Any authenticated user
+  - Retrieve: The enrolled student or staff members
+  - Update/Delete: Staff members only
+
+### Testing API Features
+
+1. **Test Filtering and Search**:
+   ```bash   
+   # Filter active students
+   curl -H "Authorization: Bearer <your-token>" "http://127.0.0.1:8000/api/students/?status=active"
+
+   # Search for students
+   curl -H "Authorization: Bearer <your-token>" "http://127.0.0.1:8000/api/students/?search=john"
+   ```
+
+2. **Test Pagination**:
+   ```bash
+   # Get second page with 20 items
+   curl -H "Authorization: Bearer <your-token>" "http://127.0.0.1:8000/api/students/?page=2&page_size=20"
+   ```
+
+3. **Test Permissions**:
+   ```bash
+   # Try to update another student's record (should fail)
+   curl -X PATCH -H "Authorization: Bearer <your-token>" "http://127.0.0.1:8000/api/students/2/" -d '{"status":"inactive"}'
+   ```
+
 ## Project Structure
 
 ```
