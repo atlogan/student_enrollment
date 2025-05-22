@@ -20,6 +20,10 @@ class StudentCreateView(LoginRequiredMixin, CreateView):
     fields = ['name', 'major', 'enrollment_date'] # Specify fields to include in the form OR use form_class
     success_url = reverse_lazy('student_list') # Redirect after successful creation
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 
 class StudentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Student
@@ -52,7 +56,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     # Read operations allowed if IsAuthenticated passes.
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly] 
     # Filtering configuration (uses global DEFAULT_FILTER_BACKENDS)
-    filterset_fields = ['name', 'major'] # Fields for exact matches (e.g., ?field1=value)
+    filterset_fields = ['name', 'owner__username'] # Fields for exact matches (e.g., ?field1=value)
     search_fields = ['name', 'major']    # Fields for ?search=... parameter
     ordering_fields = ['major', 'enrollment_date'] # Fields for ?ordering=... parameter
     # Ensure Owner is set to the current user on creation

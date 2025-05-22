@@ -5,7 +5,8 @@ class Student(models.Model):
     name = models.CharField(max_length=100)
     major = models.CharField(max_length=50)
     enrollment_date = models.DateField()
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='items', on_delete=models.CASCADE)
+    
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='%(class)s_items', on_delete=models.CASCADE)
     
     def __str__(self):
         return f"{self.name}"
