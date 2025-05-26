@@ -15,8 +15,52 @@ A Django-based student enrollment system with user authentication, permissions, 
 - Python 3.10 or higher
 - PostgreSQL
 - Google Cloud Platform Account (for OAuth)
+- Docker and Docker Compose (for containerized setup)
 
 ## Installation
+
+### Option 1: Docker Setup (Recommended)
+
+1. Clone the repository:
+```bash
+git clone https://github.com/atlogan/student_enrollment
+cd student_enrollment
+```
+
+2. Create a `.env` file:
+```bash
+cp .env.example .env
+```
+
+3. Update the `.env` file with your configuration:
+```env
+DEBUG=True
+SECRET_KEY=your-secret-key
+DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+ACCOUNT_EMAIL_REQUIRED=True
+ACCOUNT_USERNAME_REQUIRED=False
+ACCOUNT_AUTHENTICATION_METHOD='email'
+ACCOUNT_EMAIL_VERIFICATION='optional'
+LOGIN_REDIRECT_URL='/'
+ACCOUNT_LOGOUT_REDIRECT_URL='/'
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=postgres
+```
+
+4. Build and start the containers:
+```bash
+docker compose build
+docker compose up -d
+```
+
+5. The application will be available at:
+   - Web Interface: http://localhost:8000
+   - API Interface: http://localhost:8000/api/
+
+### Option 2: Local Development Setup
 
 1. Clone the repository:
 ```bash
@@ -77,6 +121,29 @@ python manage.py migrate
 ```
 
 ## Running the Application
+
+### Using Docker (Recommended)
+
+1. Start the application:
+```bash
+docker compose up -d
+```
+
+2. View logs:
+```bash
+docker compose logs -f web
+```
+
+3. Stop the application:
+```bash
+docker compose down
+```
+
+4. Access the application:
+   - Web Interface: http://localhost:8000
+   - API Interface: http://localhost:8000/api/
+
+### Using Local Development Server
 
 1. Start the development server:
 ```bash
@@ -233,3 +300,19 @@ student_enrollment/
 - Keep your `SECRET_KEY` secure
 - Regularly update dependencies
 - Use HTTPS in production
+
+## Database Management
+
+### Using Docker
+
+The database migrations are automatically run when the containers start up. However, if you need to run migrations manually:
+
+```bash
+docker compose exec web python manage.py migrate
+```
+
+To create a superuser:
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
