@@ -1,0 +1,44 @@
+# docker-compose.yml
+version: '3.8' # Use a current version
+
+services:
+  # Web Service (Your Django/DRF Application)
+  web:
+    build: . # Build the image from the Dockerfile in the current directory
+    container_name: django_web
+    # Command to run (includes migration check and Gunicorn start)
+    # Adjust 'myproject.wsgi:application' if your project name differs
+    command: sh -c "python manage.py migrate && gunicorn myproject.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      # Mount current directory into container for development (live code reload)
+      # For production, you'd typically just rely on the code copied in the Dockerfile
+      - .:/app 
+    ports:
+      # Map host port 8000 to container port 8000
+      - "8000:8000" 
+    env_file:
+      # Load environment variables from .env file
+      - .env 
+    depends_on:
+      # Wait for the db service to be ready (basic check, doesn't guarantee DB is fully initialized)
+      - db 
+
+  # Database Service (PostgreSQL)
+  db:
+    image: postgres:16-alpine # Use a specific, recent version of Postgres
+    container_name: postgres_db
+    volumes:
+      # Mount a named volume to persist database data
+      - postgres_data:/var/lib/postgresql/data/ 
+    env_file:
+      # Load environment variables from .env file (for POSTGRES_USER, etc.)
+      - .env 
+    # Expose port 5432 *only* internally to other containers on the same network
+    # Do NOT map it to the host in production unless absolutely necessary.
+    # expose:
+    #  - 5432
+    # No 'ports' mapping needed here for typical web app setup
+
+# Define the named volume for database persistence
+volumes:
+  postgres_data:
