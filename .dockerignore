@@ -1,0 +1,27 @@
+# .dockerignore
+
+# Git files
+.git
+.gitignore
+
+# Docker files
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Environment variables
+.env
+.env.*
+
+# Python virtual environment
+venv/
+*.pyc
+__pycache__/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Other (add specific project files if needed)
+# media/
+# staticfiles/
