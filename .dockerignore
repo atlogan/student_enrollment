@@ -23,5 +23,6 @@ __pycache__/
 Thumbs.db
 
 # Other (add specific project files if needed)
+notes.md
 # media/
 # staticfiles/
