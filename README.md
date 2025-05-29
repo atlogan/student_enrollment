@@ -48,6 +48,7 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_DB=postgres
+POSTGRES_HOST='db'
 ```
 
 4. Build and start the containers:
