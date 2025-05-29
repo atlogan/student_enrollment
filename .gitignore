@@ -4,3 +4,4 @@ __pycache__/
 venv/
 .env
 notes.md
+*.pem

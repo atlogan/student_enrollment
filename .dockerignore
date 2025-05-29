@@ -26,3 +26,4 @@ Thumbs.db
 notes.md
 # media/
 # staticfiles/
+*.pem
