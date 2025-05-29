@@ -109,7 +109,7 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 6. Create OAuth client ID:
    - Application type: Web application
    - Name: "Django Student Enrollment"
-   - Authorized redirect URI: `http://127.0.0.1:8000/accounts/google/login/callback/` (and/or http://localhost:8000/accounts/google/login/callback/)
+   - Authorized redirect URI: `http://localhost:8000/accounts/google/login/callback/` (and/or http://localhost:8000/accounts/google/login/callback/)
 7. Copy the Client ID and Client Secret to your `.env` file
 
 ## Database Setup
@@ -314,7 +314,7 @@ docker compose down
 python manage.py runserver
 ```
 
-2. Visit `http://127.0.0.1:8000` in your browser
+2. Visit `http://localhost:8000` in your browser
 
 ## Testing Authentication
 
@@ -323,11 +323,11 @@ python manage.py runserver
 ```bash
 python manage.py createsuperuser
 ```
-2. Visit `http://127.0.0.1:8000/accounts/login/`
+2. Visit `http://localhost:8000/accounts/login/`
 3. Log in with your superuser credentials
 
 ### Google Authentication
-1. Visit `http://127.0.0.1:8000/accounts/login/`
+1. Visit `http://localhost:8000/accounts/login/`
 2. Click "Login with Google"
 3. Select your Google account
 4. Authorize the application
@@ -363,11 +363,11 @@ python manage.py runserver
 ```
 
 2. Log in to the web interface first:
-   - Visit `http://127.0.0.1:8000/accounts/login/`
+   - Visit `http://localhost:8000/accounts/login/`
    - Log in with your credentials
 
 3. Access the API:
-   - Visit `http://127.0.0.1:8000/api/` to see available endpoints
+   - Visit `http://localhost:8000/api/` to see available endpoints
    - Use the browsable API interface to test endpoints
    - All endpoints require authentication
 
@@ -429,22 +429,22 @@ The API implements custom permission logic:
 1. **Test Filtering and Search**:
    ```bash   
    # Filter active students
-   curl -H "Authorization: Bearer <your-token>" "http://127.0.0.1:8000/api/students/?status=active"
+   curl -H "Authorization: Bearer <your-token>" "http://localhost:8000/api/students/?status=active"
 
    # Search for students
-   curl -H "Authorization: Bearer <your-token>" "http://127.0.0.1:8000/api/students/?search=john"
+   curl -H "Authorization: Bearer <your-token>" "http://localhost:8000/api/students/?search=john"
    ```
 
 2. **Test Pagination**:
    ```bash
    # Get second page with 20 items
-   curl -H "Authorization: Bearer <your-token>" "http://127.0.0.1:8000/api/students/?page=2&page_size=20"
+   curl -H "Authorization: Bearer <your-token>" "http://localhost:8000/api/students/?page=2&page_size=20"
    ```
 
 3. **Test Permissions**:
    ```bash
    # Try to update another student's record (should fail)
-   curl -X PATCH -H "Authorization: Bearer <your-token>" "http://127.0.0.1:8000/api/students/2/" -d '{"status":"inactive"}'
+   curl -X PATCH -H "Authorization: Bearer <your-token>" "http://localhost:8000/api/students/2/" -d '{"status":"inactive"}'
    ```
 
 ## Project Structure
