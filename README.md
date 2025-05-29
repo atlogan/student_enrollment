@@ -120,6 +120,169 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 python manage.py migrate
 ```
 
+## AWS Deployment
+
+This project is deployed on AWS using the following services:
+- Amazon ECR (Elastic Container Registry) for storing Docker images
+- Amazon EC2 for hosting the application
+- IAM Roles for secure access management
+
+### Prerequisites
+- AWS CLI installed and configured
+- Docker and Docker Compose installed locally
+- AWS account with appropriate permissions
+
+### Deployment Process
+
+#### 1. Setting up ECR Repository
+```bash
+# Create ECR repository
+aws ecr create-repository --repository-name student-enrollment
+
+# Login to ECR
+aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.<your-region>.amazonaws.com
+```
+
+#### 2. Building and Pushing Docker Image
+```bash
+# Build the image
+docker build -t student-enrollment .
+
+# Tag the image for ECR
+docker tag student-enrollment:latest <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/student-enrollment:latest
+
+# Push to ECR
+docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/student-enrollment:latest
+```
+
+#### 3. EC2 Instance Setup
+1. Launch an EC2 instance (t3.micro recommended for Free Tier)
+2. Configure security group to allow:
+   - SSH (port 22)
+   - HTTP (port 80)
+   - Custom TCP (port 8000 for Django)
+3. Attach an IAM role with ECR pull permissions (AmazonEC2ContainerRegistryReadOnly)
+4. SSH into the instance and install Docker:
+```bash
+# Update system
+sudo yum update -y
+
+# Install Docker Engine and Docker Compose V2 plugin
+sudo yum install -y docker docker-compose-plugin
+
+# Start and enable Docker service
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Add ec2-user to docker group
+sudo usermod -aG docker ec2-user
+
+# Activate group changes without logout/login
+newgrp docker
+
+# Verify installations
+docker --version
+docker compose version
+```
+
+#### 4. Required File Modifications
+
+##### docker-compose.yml (Production Version)
+The production version of docker-compose.yml requires several modifications:
+1. Replace the `build: .` directive with the ECR image reference
+2. Remove the local volume mount for code
+3. Adjust the command to only run Gunicorn (migrations will be run separately)
+4. Ensure proper port mapping
+
+Example production docker-compose.yml:
+```yaml
+version: '3.8'
+services:
+  web:
+    image: <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/student-enrollment:latest
+    container_name: django_web
+    command: gunicorn myproject.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    restart: always
+
+volumes:
+  postgres_data:
+```
+
+##### .env (Production Version)
+The production .env file requires specific modifications:
+1. Set DEBUG=False for security
+2. Configure ALLOWED_HOSTS with EC2 public IP/DNS
+3. Set CSRF_TRUSTED_ORIGINS for the EC2 access URLs
+4. Use production-grade secret key
+
+Example production .env:
+```env
+DEBUG=False
+SECRET_KEY=your-secure-production-key
+ALLOWED_HOSTS=your-ec2-public-ip,your-ec2-public-dns
+CSRF_TRUSTED_ORIGINS=http://your-ec2-public-ip:8000,http://your-ec2-public-dns:8000
+DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=postgres
+ACCOUNT_EMAIL_REQUIRED=True
+ACCOUNT_USERNAME_REQUIRED=False
+ACCOUNT_AUTHENTICATION_METHOD='email'
+ACCOUNT_EMAIL_VERIFICATION='optional'
+LOGIN_REDIRECT_URL='/'
+ACCOUNT_LOGOUT_REDIRECT_URL='/'
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+#### 5. Deploying to EC2
+1. Transfer files to EC2:
+```bash
+# From your local machine
+scp -i your-key.pem docker-compose.yml .env ec2-user@your-ec2-ip:~/
+```
+
+2. SSH into EC2 and run the application:
+```bash
+# Login to ECR (if not using IAM role)
+aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.<your-region>.amazonaws.com
+
+# Start the application
+docker compose up -d
+
+# Run migrations
+docker compose exec web python manage.py migrate
+
+# Create superuser (if needed)
+docker compose exec web python manage.py createsuperuser
+```
+
+The application should now be accessible at `http://your-ec2-public-ip:8000`
+
+### Important Notes
+- Never commit the production `.env` or modified `docker-compose.yml` files
+- Keep your AWS credentials secure
+- Regularly update your EC2 instance and Docker images
+- Consider setting up HTTPS using AWS Certificate Manager
+- Monitor your application using AWS CloudWatch
+- Set up regular backups of your PostgreSQL database
+- Remember to stop or terminate your EC2 instance when not in use to avoid unnecessary charges
+
 ## Running the Application
 
 ### Using Docker (Recommended)
