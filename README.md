@@ -45,9 +45,9 @@ LOGIN_REDIRECT_URL='/'
 ACCOUNT_LOGOUT_REDIRECT_URL='/'
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=postgres
+POSTGRES_USER=your-user
+POSTGRES_PASSWORD=your-password
+POSTGRES_DB=your-db
 POSTGRES_HOST='db'
 ```
 
