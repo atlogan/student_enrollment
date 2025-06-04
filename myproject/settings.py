@@ -152,13 +152,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Required for Allauth/Google OAuth when running behind an HTTPS proxy like Nginx
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True # Redirects all HTTP requests to HTTPS
-
-# Add this for security in production if you don't already have it
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
