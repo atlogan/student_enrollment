@@ -2,11 +2,20 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .models import Student # Import your specific model
 from .serializers import StudentSerializer
 from .permissions import IsOwnerOrReadOnly
+
+
 # Create your views here.
+
+class HealthCheckView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
 class StudentListView(LoginRequiredMixin, ListView):
     model = Student    
 
