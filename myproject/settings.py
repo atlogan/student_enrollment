@@ -13,13 +13,14 @@ import environ
 import os
 from pathlib import Path
 
-
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
+    DEBUG=(bool, False),
+    DATABASE_URL=(str, 'postgres://myuser:mypassword@postgres-service:5432/studentenrollment')
 )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 env_file_path = BASE_DIR / '.env'
 if os.path.exists(env_file_path):
@@ -165,9 +166,9 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         # Require users to be authenticated for all API access by default
-        'rest_framework.permissions.IsAuthenticated',
+        #'rest_framework.permissions.IsAuthenticated',
         # Alternatives:
-        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly' # Allows anonymous GET requests
+         'rest_framework.permissions.IsAuthenticatedOrReadOnly' # Allows anonymous GET requests
         # 'rest_framework.permissions.AllowAny' # No restrictions (use carefully!)
     ],
     'DEFAULT_FILTER_BACKENDS': [

@@ -284,6 +284,132 @@ The application should now be accessible at `http://your-ec2-public-ip:8000`
 - Set up regular backups of your PostgreSQL database
 - Remember to stop or terminate your EC2 instance when not in use to avoid unnecessary charges
 
+## Kubernetes Deployment
+
+### Prerequisites
+- Minikube or Docker Desktop with Kubernetes enabled
+- kubectl CLI tool
+- Helm v3+
+- Docker image of the application (local or in a registry)
+
+### Local Kubernetes Setup
+
+1. Start Minikube:
+```bash
+minikube start
+```
+
+2. Add Health Check Endpoint
+Add to `myapp/views.py`:
+```python
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+class HealthCheckView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
+```
+
+Add to `myapp/urls.py`:
+```python
+from django.urls import path
+from .views import HealthCheckView
+
+urlpatterns = [
+    # ... other urls
+    path('health/', HealthCheckView.as_view(), name='health_check'),
+]
+```
+
+3. Create Kubernetes Secrets
+```bash
+# Create postgres secret
+echo "POSTGRES_PASSWORD=your_actual_db_password" > k8s-pg-secrets.env
+kubectl create secret generic postgres-secret --from-env-file=k8s-pg-secrets.env
+rm k8s-pg-secrets.env
+
+# Create app secret
+cat > k8s-app-secrets.env << EOL
+SECRET_KEY=your_production_django_secret_key
+DATABASE_URL=postgres://your_db_user:your_actual_db_password@postgres-service:5432/your_db_name
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+EOL
+kubectl create secret generic app-secret --from-env-file=k8s-app-secrets.env
+rm k8s-app-secrets.env
+```
+
+4. Image Management
+For local images with Minikube:
+```bash
+# Option 1: Build with Minikube's Docker daemon
+eval $(minikube -p minikube docker-env)
+docker build -t student-enrollment:latest .
+
+# Option 2: Load existing image
+minikube image load student-enrollment:latest
+```
+
+5. Deploy Application
+```bash
+# Apply all manifests
+kubectl apply -f k8s/postgres-pvc.yaml
+kubectl apply -f k8s/postgres-deployment.yaml
+kubectl apply -f k8s/postgres-service.yaml
+kubectl apply -f k8s/app-configmap.yaml
+kubectl apply -f k8s/app-deployment.yaml
+kubectl apply -f k8s/app-service.yaml
+
+# Run migrations
+kubectl exec $(kubectl get pod -l app=myapp -o jsonpath="{.items[0].metadata.name}") -- python manage.py migrate
+```
+
+6. Access Application
+```bash
+# Get service URL
+minikube service app-service --url
+
+# Or use port-forwarding
+kubectl port-forward service/app-service 8000:80
+```
+
+### Monitoring Setup
+
+1. Install Prometheus & Grafana:
+```bash
+# Add Helm repo
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+# Install monitoring stack
+helm install prom-stack prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace --version 72.0.1
+```
+
+2. Access Grafana:
+```bash
+# Get admin password
+kubectl get secret --namespace monitoring prom-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode
+
+# Port-forward to Grafana
+kubectl port-forward --namespace monitoring svc/prom-stack-grafana 3000:80
+```
+Access Grafana at http://localhost:3000 (admin/password-from-above)
+
+### Scaling & Updates
+
+```bash
+# Scale deployment
+kubectl scale deployment app-deployment --replicas=3
+
+# Rolling update
+kubectl set image deployment/app-deployment web=student-enrollment:v2
+kubectl rollout status deployment/app-deployment
+
+# Rollback if needed
+kubectl rollout undo deployment/app-deployment
+```
+
 ## Running the Application
 
 ### Using Docker (Recommended)

@@ -1,0 +1,54 @@
+# k8s/app-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 2 # Run 2 instances for basic availability
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+        - name: web
+          # Replace with your image URI (e.g., ECR or Docker Hub)
+          # image: <aws_account_id>.dkr.ecr.<region>[.amazonaws.com/](https://.amazonaws.com/)<your_repo_name>:latest 
+          # Or use a locally built image if Minikube/Docker Desktop can access it
+          image: student-enrollment:latest
+          # Note on Image Pulling for Local Clusters (Minikube/Docker Desktop):
+          # - If using Docker Desktop, it usually shares Docker Engine's image cache, so images built locally might be found.
+          # - If using Minikube, ensure your Docker daemon is the one Minikube uses (e.g., `eval $(minikube -p minikube docker-env)`) before building, or load images via `minikube image load your-image-name:latest`.
+          # - For private registries like AWS ECR, your Kubernetes cluster needs credentials. While an EC2 instance uses an IAM role, local clusters might need an `imagePullSecret`.
+          #   Refer to Kubernetes documentation on `imagePullSecrets` if you encounter image pull errors from private registries.
+          imagePullPolicy: IfNotPresent # Or IfNotPresent for local testing, 'Always' ensures updates are pulled
+          ports:
+            - containerPort: 8000 # Port Gunicorn listens on
+          envFrom: # Load vars from ConfigMap and Secret
+            - configMapRef:
+                name: app-configmap
+            - secretRef:
+                name: app-secret # References secret created via kubectl
+          # Liveness and Readiness Probes help K8s manage your app
+          # Ensure your application has a /api/health/ (or similar) endpoint that returns HTTP 200.
+          readinessProbe:
+            httpGet:
+              path: api/health/ # IMPORTANT: Replace with your actual health check endpoint
+              port: 8000
+            initialDelaySeconds: 20 # Wait 20s before first probe (allow app to start)
+            periodSeconds: 20   # Probe every 20s
+            timeoutSeconds: 5     # Probe timeoutS
+            failureThreshold: 3 # Consider pod unhealthy after 3 failures
+          livenessProbe:
+            httpGet:
+              path: api/health/ # IMPORTANT: Replace with your actual health check endpoint
+              port: 8000
+            initialDelaySeconds: 45 # Wait 45s before first probe (allow more time than readiness)
+            periodSeconds: 30   # Probe every 30s
+            timeoutSeconds: 5     # Probe timeout
+            failureThreshold: 3 # Restart pod after 3 failures

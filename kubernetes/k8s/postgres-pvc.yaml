@@ -1,0 +1,12 @@
+# k8s/postgres-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce # Allows mounting by a single node
+  resources:
+    requests:
+      storage: 1Gi # Request 1 Gibibyte of storage
+  # storageClassName: standard # Optional: Specify if not using default (Minikube often has a default)

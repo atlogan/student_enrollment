@@ -6,3 +6,7 @@ venv/
 notes.md
 *.pem
 .vscode
+
+internal/
+
+kubernetes/*.env

@@ -1,0 +1,13 @@
+# k8s/postgres-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service # This name is used as the DB host for the web app
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432       # Service port
+      targetPort: 5432  # Container port
+  type: ClusterIP # Only needs to be accessible within the cluster

@@ -1,3 +1,4 @@
+# myapp/views.py
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -8,10 +9,11 @@ from rest_framework.response import Response
 from .models import Student # Import your specific model
 from .serializers import StudentSerializer
 from .permissions import IsOwnerOrReadOnly
-
+# from django.views.decorators.csrf import csrf_exempt # Import this
 
 # Create your views here.
 
+# @csrf_exempt # Add this decorator
 class HealthCheckView(APIView):
     def get(self, request, *args, **kwargs):
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
@@ -71,4 +73,4 @@ class StudentViewSet(viewsets.ModelViewSet):
     # Ensure Owner is set to the current user on creation
     def perform_create(self, serializer):
             # Assumes 'owner' field exists on YourModel and is linked to User
-            serializer.save(owner=self.request.user)    
+            serializer.save(owner=self.request.user)

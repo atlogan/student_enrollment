@@ -1,0 +1,14 @@
+# k8s/app-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-configmap
+data:
+  DEBUG: 'True'
+  ALLOWED_HOSTS: '*'
+  ACCOUNT_EMAIL_REQUIRED: 'False'
+  ACCOUNT_USERNAME_REQUIRED: 'True'
+  ACCOUNT_AUTHENTICATION_METHOD: 'username'
+  ACCOUNT_EMAIL_VERIFICATION: 'optional'
+  LOGIN_REDIRECT_URL: '/'
+  ACCOUNT_LOGOUT_REDIRECT_URL: '/'

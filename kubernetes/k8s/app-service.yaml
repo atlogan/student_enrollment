@@ -1,0 +1,16 @@
+# k8s/app-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80        # External port (NodePort/LoadBalancer)
+      targetPort: 8000 # Container port (Gunicorn)
+  # Use NodePort for Minikube access
+  # Use LoadBalancer if your environment (like Docker Desktop K8s) supports it
+  type: NodePort 
+  # type: LoadBalancer
